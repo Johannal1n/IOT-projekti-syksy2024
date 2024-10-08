@@ -1,0 +1,4 @@
+//Samaan kansioon server.js:n kanssa
+
+min: 20
+max: 25
