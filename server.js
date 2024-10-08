@@ -28,3 +28,6 @@ server.listen(port, () => {
     console.log(Server is running on http://localhost:${port});
 });
 
+
+//Käynnistä palvelin terminaalissa komennolla node server.js
+//tarkista selaimen osoitteesta http://localhost:3000/settings
