@@ -1,4 +1,4 @@
 //Samaan kansioon server.js:n kanssa
-
+//tarkista lukemat
 min: 20
 max: 25
