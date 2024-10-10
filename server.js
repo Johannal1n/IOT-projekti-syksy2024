@@ -1,35 +1,36 @@
-//VS Codeen. Varmista, että Node.js asennettu ja npm. Aja npm init -y.
-
-const http = require('http');
-const fs = require('fs');
-const port = 3000; //portin määritys
-// tuo sisäänrakennetun http moduulin
-
-
-const requestHandler = (req, res) => { //käsittelee saapuvat http-pyynnöt
-    if (req.url.startsWith('/settings')) {
-        fs.readFile('settings.txt', 'utf8', (err, data) => { //lukee tideoston, katso muuten ne ovatko oikeat lukemat!!
+// Ohjelmaa ajetaan node *tiedoston nimi*
+ 
+const express = require('express'); // kirjasto käyttöön
+const fs = require('fs'); // file system tarvitaan, jotta voidaan kirjoittaa ja lukea tiedostoa
+const app = express(); // käytetään kirjastoa
+const port = 8080; // määrittelee portin
+ 
+app.get('/changeSettings', (req, res) => { //osoite, mihin mennään, localhost
+                                            // voi tehdä useita, kun kopioi ja käyttää eri nimeä
+                                            // request ja response
+    if(req.query.min){ // katsoo onko requestyssä query tieto min
+    //aseta req.query.min;
+        fs.writeFile('min.txt', req.query.min, (err) => { //min.txt, tiedosto, pilkun jälkeen tulee se, mitä tiedostoon kirjoitetaan
             if (err) {
-                res.writeHead(500, { 'Content-Type': 'text/plain' });
-                res.end('Error reading settings file');
-                return;
+                console.error('Error:', err);
+                return res.status(500).send('error');
             }
-
-            res.writeHead(200, { 'Content-Type': 'application/json' }); //Muuttaa datan json-objektiksi.
-            res.end(JSON.stringify({ settings: data }));
+            res.send('Min: ' + req.query.min + ' updated.');
         });
-    } else {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('404 Not Found');
+    }else{
+        //näytä asetukset
+        fs.readFile('min.txt', 'utf8', (err, data) => {
+            if (err) {
+                console.error('Error:', err);
+                return res.status(500).send('error');
+            }
+            res.send('Min: ' + data);
+        });
     }
-};
-
-const server = http.createServer(requestHandler); //luo http palvelimen käyttäen http-moduulia
-
-server.listen(port, () => {
-    console.log(Server is running on http://localhost:${port}); //kuuntelee tuolla aiemmin määriteltyä porttia 3000
-});
-
-
-//Käynnistä palvelin terminaalissa komennolla node server.js
-//tarkista selaimen osoitteesta http://localhost:3000/settings
+   });  
+ 
+ 
+// starttaa palvelun
+app.listen(port, () => {
+    console.log(`Simple backend @ http://localhost:${port}`); //localhost ja ipaddress
+   });
