@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Temperature Reader</title>
+<script>
+    async function fetchTemperature() {
+      try {
+        const response = await fetch('http://localhost:8080/temperature');
+        const data = await response.json();
+        document.getElementById('temperature').innerText = `Current Temperature: ${data.temperature}°C`;
+      } catch (error) {
+        console.error('Error fetching temperature:', error);
+      }
+    }
+</script>
+</head>
+<body>
+<h1>Temperature Reader</h1>
+<button onclick="fetchTemperature()">Get Temperature</button>
+<p id="temperature"></p>
+</body>
+</html>
+<!-- 
+sisältää pikavalikon -->
