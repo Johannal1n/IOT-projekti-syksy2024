@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Temperature Management</title>
+  <script>
+    async function fetchTemperature() {
+      try {
+        const response = await fetch('http://localhost:8080/temperature');
+        const data = await response.json();
+        document.getElementById('currentTemperature').innerText = Current Temperature: ${data.temperature}°C;
+      } catch (error) {
+        console.error('Error fetching temperature:', error);
+      }
+    }
+
+    async function fetchSettings() {
+      try {
+        const response = await fetch('http://localhost:8080/settings');
+        const data = await response.json();
+        document.getElementById('minTemperature').value = data.minTemperature;
+        document.getElementById('maxTemperature').value = data.maxTemperature;
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+      }
+    }
+
+    async function updateSettings() {
+      const newMinTemperature = document.getElementById('minTemperature').value;
+      const newMaxTemperature = document.getElementById('maxTemperature').value;
+      try {
+        const response = await fetch('http://localhost:8080/settings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ minTemperature: newMinTemperature, maxTemperature: newMaxTemperature })
+        });
+        const result = await response.text();
+        alert(result);
+      } catch (error) {
+        console.error('Error updating settings:', error);
+      }
+    }
+
+    window.onload = () => {
+      fetchTemperature();
+      fetchSettings();
+    };
+  </script>
+</head>
+<body>
+  <h1>Temperature Management</h1>
+  <div id="currentTemperature">Loading current temperature...</div>
+  <button onclick="document.getElementById('settingsModal').style.display='block'">Settings</button>
+
+  <div id="settingsModal" style="display:none;">
+    <h2>Update Temperature Settings</h2>
+    <label for="minTemperature">Min Temperature:</label>
+    <input type="number" id="minTemperature" name="minTemperature"><br>
+    <label for="maxTemperature">Max Temperature:</label>
+    <input type="number" id="maxTemperature" name="maxTemperature"><br>
+    <button onclick="updateSettings()">Update Settings</button>
+    <button onclick="document.getElementById('settingsModal').style.display='none'">Close</button>
+  </div>
+</body>
+</html>
