@@ -1,4 +1,4 @@
-//Samaan kansioon server.js:n kanssa
+//Samaan kansioon app.js:n kanssa
 //tarkista lukemat
 min: 22
 max: 24
