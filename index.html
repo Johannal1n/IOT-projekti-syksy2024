@@ -1,26 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Temperature Reader</title>
-<script>
-    async function fetchTemperature() {
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Temperature Management</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+      flex-direction: column;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://cdn.pixabay.com/photo/2018/04/13/20/19/smart-home-3317442_1280.jpg') no-repeat center center fixed;
+      background-size: 50%;
+      opacity: 0.1;
+      clip-path: circle(19% at center); /* Muuttaa kuvan pyöreäksi */
+      z-index: -1; /* Aseta taustakuva taakse */
+    }
+    h1 {
+      color: navy;
+    }
+    #currentTemperature {
+      color: rgb(6, 24, 6);
+    }
+    button {
+      color: rgb(8, 8, 8);
+    }
+    input[type="number"] {
+      width: 60px;
+      height: 25px;
+    }
+    .image {
+      display: none; /* Piilottaa alkuperäisen kuvan */
+    }
+  </style>
+  <script>
+    async function fetchSettings() {
       try {
-        const response = await fetch('http://localhost:8080/temperature');
+        const response = await fetch('http://10.222.209.100:8080/settings');
+        if (!response.ok) throw new Error('Failed to fetch settings');
         const data = await response.json();
-        document.getElementById('temperature').innerText = `Current Temperature: ${data.temperature}°C`;
+        document.getElementById('minTemperature').value = data.minTemperature || 0;
+        document.getElementById('maxTemperature').value = data.maxTemperature || 0;
       } catch (error) {
-        console.error('Error fetching temperature:', error);
+        console.error('Error fetching settings:', error);
       }
     }
-</script>
+ 
+    async function fetchTemperature() {
+      try {
+        const response = await fetch('http://10.222.209.100:8080/temperature');
+        if (!response.ok) throw new Error('Failed to fetch temperature');
+        const data = await response.json();
+        const currentTemperature = data.temperature;
+        document.getElementById('currentTemperature').textContent = currentTemperature;
+     
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+        document.getElementById('currentTemperature').textContent = 'Error';
+      }
+    }
+
+
+  
+    async function updateSettings() {
+      const newMinTemperature = document.getElementById('minTemperature').value;
+      const newMaxTemperature = document.getElementById('maxTemperature').value;
+  
+      if (!newMinTemperature || !newMaxTemperature) {
+        alert('Please fill in both fields');
+        return;
+      }
+  
+      try {
+        const response = await fetch('http://10.222.209.100:8080/settings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ minTemperature: newMinTemperature, maxTemperature: newMaxTemperature }),
+        });
+  
+        if (!response.ok) throw new Error('Failed to update settings');
+        alert(await response.text());
+      } catch (error) {
+        console.error('Error updating settings:', error);
+      }
+    }
+
+   // Kutsutaan funktioita heti, kun sivu ladataan
+   // window.onload = fetchSettings;
+   window.onload = () => {
+    fetchSettings();
+    fetchTemperature();
+   };
+
+  </script>  
 </head>
 <body>
-<h1>Temperature Reader</h1>
-<button onclick="fetchTemperature()">Get Temperature</button>
-<p id="temperature"></p>
+  <h1>Temperature Management</h1>                                                                       
+  <p>Current Temperature: <span id="currentTemperature">--</span> °C</p>
+                                    
+  <button onclick="document.getElementById('settingsModal').style.display='block'" style="margin-top: 20px;">Settings</button>    
+
+  <div id="settingsModal" style="display:none;">                                                        
+    <h2>Update Temperature Settings</h2>
+    <label for="minTemperature">Min Temperature:</label>
+    <input type="number" id="minTemperature" name="minTemperature" style="width: 60px; height: 25px;"><br>
+    <label for="maxTemperature">Max Temperature:</label>
+    <input type="number" id="maxTemperature" name="maxTemperature" style="width: 60px; height: 25px; margin-top: 20px;"><br>
+    <button onclick="updateSettings()" style="margin-top: 20px;">Update Settings</button>
+    <button onclick="document.getElementById('settingsModal').style.display='none'">Close</button>
+  </div>
 </body>
 </html>
-<!-- 
-sisältää pikavalikon -->
